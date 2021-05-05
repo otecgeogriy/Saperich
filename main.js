@@ -5,9 +5,11 @@ let H = 10;
 let W_field = W * K; //ширина поля
 let H_field = H * K; //Высотааааа поля
 let beru_minu = 13;
-
+let mines = [];
+let PapuchON = false;
 function preload() {
   MiNa = loadImage("papzan.gif");
+  Losik = loadImage("losik.gif");
 }
 
 function setup() {
@@ -16,10 +18,13 @@ function setup() {
   canv.parent(root);
   MiNa.play();
 
-  let inp = createInput("Введите кол-во мин");
-  inp.position(W * K + 10, (H * K) / 2 + 5);
+  let inp = createInput("13");
+  inp.position(W * K + 10, (H * K) / 2 + 15);
   inp.size(150);
   inp.input(myInputEvent);
+
+  pamParam();
+  console.log(mines);
 }
 
 function myInputEvent() {
@@ -31,15 +36,50 @@ function myInputEvent() {
     beru_minu = 0;
   }
   if (isNaN(beru_minu)) beru_minu = 13;
+  if (beru_minu > W * H) {
+    beru_minu = 100;
+  }
   console.log(beru_minu);
+  pamParam();
+}
+
+function pRoVeRKa(x, y) {
+  console.log(mines);
+  for (let i = 0; i < mines.length; i++) {
+    console.log(`X: ${mines[i].X}, Y: ${mines[i].Y}, x: ${x}, y:${y}`);
+    //if (mines[i].X == x && mines[i].Y == y) {
+    if (mines[i].Y == y && mines[i].X == x) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function pamParam() {
+  mines = [];
+
+  for (let i = 0; i < beru_minu; i++) {
+    let minesX = Math.round(Math.random() * (W - 1));
+    let minesY = Math.round(Math.random() * (H - 1));
+    while (!pRoVeRKa(minesX, minesY)) {
+      minesX = Math.round(Math.random() * (W - 1));
+      minesY = Math.round(Math.random() * (H - 1));
+    }
+    let Minich = {
+      X: minesX,
+      Y: minesY,
+    };
+    mines.push(Minich);
+  }
 }
 
 function svoya_functia() {
-  for (let i = 0; i <= beru_minu; i++) {
+  for (let i = 0; i < mines.length; i++) {
     image(
       MiNa,
-      Math.round(Math.random() * (W - 1)) * K + 1,
-      Math.round(Math.random() * (H - 1)) * K + 1,
+      mines[i].X * K + 1, //Math.round(Math.random() * (W - 1)) * K + 1,
+      mines[i].Y * K + 1, //Math.round(Math.random() * (H - 1)) * K + 1,
+
       K - 1,
       K - 1
     );
@@ -54,8 +94,22 @@ function draw() {
   for (let j = 0; j <= H; j++) {
     line(0, K * j, K * H, K * j);
   }
-  image(MiNa, 1, 1, K - 1, K - 1);
+  //image(MiNa, 1, 1, K - 1, K - 1);
   svoya_functia();
+  text("Введите кол-во мин", W * K + 10, (H * K) / 2 + 5);
+  if (PapuchON) {
+    image(Losik, 0, 0, width, height);
+  }
+}
+
+function mousePressed() {
+  PapuchON = true;
+
+  Losik.play();
+}
+function mouseReleased() {
+  PapuchON = false;
+  Losik.pause();
 }
 
 //line(X1, Y1, X2, Y2);
