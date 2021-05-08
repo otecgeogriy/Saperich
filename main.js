@@ -1,54 +1,46 @@
-let MiNa;
-let K = 75; //коэф-нт для 1 клеточки
-let W = 10;
-let H = 10;
-let W_field = W * K; //ширина поля
-let H_field = H * K; //Высотааааа поля
-let beru_minu = 13;
-let mines = [];
-let PapuchON = false;
-function preload() {
-  MiNa = loadImage("papzan.gif");
-  Losik = loadImage("losik.gif");
-}
+const K = 75; // Коэф-нт для 1 клеточки
+const W = 10; // Гирина поля
+const H = 10; // Высотааааа поля
+const mines = []; // Массив мин
+
+let MiNa; // картинка мины
+let Losik; // картинка папани
+let beru_minu = 13; // Кол-во мин
+let PapuchON = false; // Влключен ли скример папани
 
 function setup() {
-  let root = document.getElementById("canvasRoot");
-  canv = createCanvas(root.offsetWidth, root.offsetHeight);
-  canv.parent(root);
-  MiNa.play();
+  // P5 function
+  setupCanvas(); // Растягиваем холст на весь экран
+  initAnimations(); // Автоматически запускаем анмиации
 
-  let inp = createInput("13");
-  inp.position(W * K + 10, (H * K) / 2 + 15);
-  inp.size(150);
-  inp.input(myInputEvent);
+  createNiceInput("13", W * K + 10, (H * K) / 2 + 15, 150, mineInputHandler);
+  // Делаем поле ввода для мин
 
-  pamParam();
-  console.log(mines);
+  pamParam(); // Рандомим мины
 }
 
-function myInputEvent() {
-  //console.log("you are typing: ", this.value());
-  //beru_minu = this.value();
-  if (this.value() != "") {
-    beru_minu = Number(this.value());
-  } else {
-    beru_minu = 0;
-  }
+function mineInputHandler(event) {
+  // Обработчик ввода значений в поле кол-ва мин
+  // this.value() - текущее введенное значение
+  let value = event.target.value;
+
+  beru_minu = value != "" ? Number(value) : (beru_minu = 0);
+  // кол-во мин равно числу, если введено оно или нулю если введено говно
+
   if (isNaN(beru_minu)) beru_minu = 13;
-  if (beru_minu > W * H) {
-    beru_minu = 100;
-  }
+  // Если число вышло NaN (неопределнным), то сбрасываем на 13
+
+  beru_minu = Math.min(beru_minu, W * H); // if (beru_minu > W * H) beru_minu = W * H;
+  // Если кол-во мин больше кол-ва клеток
+
   console.log(beru_minu);
-  pamParam();
+  pamParam(); // Перегенериваем мины под новое кол-во
 }
 
 function pRoVeRKa(x, y) {
-  console.log(mines);
-  for (let i = 0; i < mines.length; i++) {
-    console.log(`X: ${mines[i].X}, Y: ${mines[i].Y}, x: ${x}, y:${y}`);
-    //if (mines[i].X == x && mines[i].Y == y) {
-    if (mines[i].Y == y && mines[i].X == x) {
+  // Проверка есть ли в массиве мин уже мина с координатами x , y
+  for (let mine of mines) {
+    if (mine.Y == y && mine.X == x) {
       return false;
     }
   }
@@ -56,30 +48,32 @@ function pRoVeRKa(x, y) {
 }
 
 function pamParam() {
-  mines = [];
+  clearArray(mines);
 
   for (let i = 0; i < beru_minu; i++) {
-    let minesX = Math.round(Math.random() * (W - 1));
-    let minesY = Math.round(Math.random() * (H - 1));
+    let minesX = getRandomInteger(0, W - 1);
+    let minesY = getRandomInteger(0, H - 1);
+
     while (!pRoVeRKa(minesX, minesY)) {
-      minesX = Math.round(Math.random() * (W - 1));
-      minesY = Math.round(Math.random() * (H - 1));
+      minesX = getRandomInteger(0, W - 1);
+      minesY = getRandomInteger(0, H - 1);
     }
+
     let Minich = {
       X: minesX,
       Y: minesY,
     };
+
     mines.push(Minich);
   }
 }
 
 function svoya_functia() {
-  for (let i = 0; i < mines.length; i++) {
+  for (let mine of mines) {
     image(
       MiNa,
-      mines[i].X * K + 1, //Math.round(Math.random() * (W - 1)) * K + 1,
-      mines[i].Y * K + 1, //Math.round(Math.random() * (H - 1)) * K + 1,
-
+      mine.X * K + 1, // mine = mines[i] //Math.round(Math.random() * (W - 1)) * K + 1,
+      mine.Y * K + 1, // mine = mines[i] //Math.round(Math.random() * (H - 1)) * K + 1,
       K - 1,
       K - 1
     );
@@ -87,48 +81,21 @@ function svoya_functia() {
 }
 
 function draw() {
+  // P5 function
   background("#fabcff");
+
   for (let i = 0; i <= W; i++) {
     line(K * i, 0, K * i, K * W);
   }
   for (let j = 0; j <= H; j++) {
     line(0, K * j, K * H, K * j);
   }
-  //image(MiNa, 1, 1, K - 1, K - 1);
+
   svoya_functia();
+
   text("Введите кол-во мин", W * K + 10, (H * K) / 2 + 5);
+
   if (PapuchON) {
     image(Losik, 0, 0, width, height);
   }
 }
-
-function mousePressed() {
-  PapuchON = true;
-
-  Losik.play();
-}
-function mouseReleased() {
-  PapuchON = false;
-  Losik.pause();
-}
-
-//line(X1, Y1, X2, Y2);
-
-// noFill();
-// //fill("black");
-// stroke("red");
-// //noStroke();
-// rect(100, 40, 50, 41);
-// // stroke("purple");
-// // rect(400,140,150,441)
-
-// for (let i = 0; i < nol.length; i++) {
-//   fill(nol[i][2]); //kapec
-//   rect(setka * nol[i][0], setka * nol[i][1], setka, setka); //xy width heh
-// }
-
-let nol = [
-  [10, 20, "red"],
-  [30, 40, "black"],
-  [15, 25, "blue"],
-];
