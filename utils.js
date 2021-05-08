@@ -4,7 +4,7 @@ function clearArray(array) {
 }
 */
 const clearArray = (array) => {
-  array.lenght = 0;
+  array.length = 0;
 };
 
 /*

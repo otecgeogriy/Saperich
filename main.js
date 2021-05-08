@@ -19,11 +19,12 @@ function setup() {
   pamParam(); // Рандомим мины
 }
 
-function mineInputHandler() {
+function mineInputHandler(event) {
   // Обработчик ввода значений в поле кол-ва мин
   // this.value() - текущее введенное значение
+  let value = event.target.value;
 
-  beru_minu = this.value() != "" ? Number(this.value()) : (beru_minu = 0);
+  beru_minu = value != "" ? Number(value) : (beru_minu = 0);
   // кол-во мин равно числу, если введено оно или нулю если введено говно
 
   if (isNaN(beru_minu)) beru_minu = 13;
